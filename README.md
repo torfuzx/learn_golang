@@ -1,5 +1,4 @@
-About Go  _(the programming language)_
---------------------------------------
+#### About Go  _(the programming language)_
 
 From the "[_The Go Programming Language Specification_](http://golang.org/ref/spec)":
 
