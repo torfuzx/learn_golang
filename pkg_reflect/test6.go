@@ -49,8 +49,13 @@ func main() {
 	}
 	fmt.Println()
 	{
-
+		fmt.Println("Translating a struct wrapped in an interface")
+		original := created
+		translated := translate(original)
+		fmt.Println("original: ", (*original), "->", original.Ptr)
+		fmt.Println("translated: ", (*translated.(*I)), "->", (*translated.(*I)).(B).Ptr)
 	}
+	fmt.Println()
 }
 
 func create() I {
