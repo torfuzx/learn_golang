@@ -21,8 +21,6 @@ _testmain.go
 
 *.exe
 *.test
-.*
-~.gitignore
-
+.settings/
 # eclipse 
 .project
