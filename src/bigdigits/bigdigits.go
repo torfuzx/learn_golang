@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 )
 
-// bigDigits is 
+// bigDigits is is two dimentional slice, its type is: [][]string,
+// or in simple words: a slice of (slice of type string)
 var bigDigits = [][]string{
 	{
 		"  0  ",
@@ -107,17 +108,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	// the first argument, the number to be converted & displayed, the zero-th argument being the excutable's name itself
-	stringOfDigits := os.Args[1]
+	// fmt.Printf("type of variable bigDigits: %s\n", reflect.TypeOf(bigDigits))
 
-	// iterate the numbers from user input using for...range
-	for row := range bigDigits[0] {
+	// the first argument(index value 0) being the excutable's name itself
+	// the second argument, the number to be converted & displayed
+	stringOfDigits := os.Args[1] // type: string
+
+	rowNum := len(bigDigits[0])
+	for rowIdx := 0; rowIdx < rowNum; rowIdx++ {
 		line := ""
-		// get the corresponding segment of its big digit format for the current line
-		for column := range stringOfDigits {
-			digit := stringOfDigits[column] - '0'
-			if 0 <= digit && digit <= 9 {
-				line += bigDigits[digit][row] + " "
+		for _, digit := range stringOfDigits {
+			digit -= '0'
+
+			if digit >= 0 && digit <= 9 {
+				line += bigDigits[digit][rowIdx] + " "
 			} else {
 				log.Fatal("invalid whole number")
 			}
