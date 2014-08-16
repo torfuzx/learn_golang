@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func main () {
+func main() {
 	// get the file names from the command line for input/output
 	inFilename, outFilename, err := filenamesFromCommandLine()
 
@@ -44,9 +44,9 @@ func main () {
 /**
  * Get the file names from the command line
  */
-func filenamesFromCommandLine () (inFilename, outFilename string, err error) {
+func filenamesFromCommandLine() (inFilename, outFilename string, err error) {
 	// parse command line arguments
-	if len(os.Args)	> 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
+	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		err = fmt.Errorf("usage: %s [<] infile.txt [>] outfile.txt", filepath.Base(os.Args[0]))
 		return "", "", err
 	}
@@ -67,7 +67,7 @@ func filenamesFromCommandLine () (inFilename, outFilename string, err error) {
 
 var britshAmerican = "british-american.txt"
 
-func americanize (inFile io.Reader, outFile io.Writer) (err error) {
+func americanize(inFile io.Reader, outFile io.Writer) (err error) {
 	reader := bufio.NewReader(inFile)
 	writer := bufio.NewWriter(outFile)
 
@@ -89,7 +89,7 @@ func americanize (inFile io.Reader, outFile io.Writer) (err error) {
 		var line string
 		line, err = reader.ReadString('\n')
 
-		if err == io.EOF  {
+		if err == io.EOF {
 			err = nil
 			eof = true
 		} else if err != nil {
@@ -108,24 +108,24 @@ func americanize (inFile io.Reader, outFile io.Writer) (err error) {
  * Given a string and a replacer function, for every match replace the match
  * using the replacer
  */
-func makeReplacerFunction (file string) (func(string) string, error) {
-	rawBytes, err :=  ioutil.ReadFile(file)
+func makeReplacerFunction(file string) (func(string) string, error) {
+	rawBytes, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
 	text := string(rawBytes)
 
-	usForBritish :=  make(map[string]string)
+	usForBritish := make(map[string]string)
 	lines := strings.Split(text, "\n")
 	for _, line := range lines {
-		fields  := strings.Fields(line)
+		fields := strings.Fields(line)
 		if len(fields) == 2 {
 			usForBritish[fields[0]] = fields[1]
 		}
 	}
 
-	return func (word string) string {
+	return func(word string) string {
 		if usWord, found := usForBritish[word]; found {
 			return usWord
 		}
