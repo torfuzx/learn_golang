@@ -17,6 +17,9 @@ slice
 - Slice header contains a length and a pointer to the an element of an array
 - To have a function modify the slice header, you can pass a pointer to the
   slice header.
+- The capacity is the length of the underlying array, minus the index in the
+  array of the first element of the slice.
+
 */
 
 package main
@@ -56,6 +59,61 @@ func main() {
 	pathName.ToUpper()
 	fmt.Printf("%s\n", pathName)
 
+	var iBuffer [10]int
+	iSlice := iBuffer[0:0]
+	for i := 0; i < 20; i++ {
+		iSlice = Extend(iSlice, i)
+		fmt.Println(iSlice)
+	}
+
+	{
+		printLine()
+		slice := make([]int, 10, 15)
+		fmt.Printf("len: %d, cap: %d\n", len(slice), cap(slice))
+
+		// doubles the capacity but keeps the length the same
+		newSlice := make([]int, len(slice), 2*cap(slice))
+		for i := range slice {
+			newSlice[i] = slice[i]
+		}
+		slice = newSlice
+		fmt.Printf("len: %d, cap: %d\n", len(slice), cap(slice))
+	}
+
+	{
+		printLine()
+		slice := make([]int, 10, 15)
+		fmt.Printf("len: %d, cap: %d\n", len(slice), cap(slice))
+
+		// doubles the capacity but keeps the length the same
+		newSlice := make([]int, len(slice), 2*cap(slice))
+		// copy the old data the right-hand argument to the left-hand argument
+		copy(newSlice, slice)
+		fmt.Printf("len: %d, cap: %d\n", len(slice), cap(slice))
+		slice = newSlice
+	}
+
+	{
+		printLine()
+		slice := make([]int, 10, 20)
+		for i := range slice {
+			slice[i] = i
+		}
+		fmt.Println(slice)
+		slice = Insert(slice, 5, 99)
+		fmt.Println(slice)
+	}
+
+	{
+		// test the robust version of extend
+		printLine()
+		slice := make([]int, 0, 5)
+		for i := 0; i < 10; i++ {
+			slice = Extend2(slice, 1)
+			fmt.Printf("len=%d cap=%d slice=%v\n", len(slice), cap(slice), slice)
+			fmt.Println("address of 0th element: ", &slice[0])
+		}
+	}
 }
 
 func AddOneToEachElement(slice []byte) {
@@ -90,9 +148,46 @@ func (p path) ToUpper() {
 // demonstrate on slice capacity
 // extents the slice of ints by one element
 func Extend(slice []int, element int) []int {
+	if cap(slice) == len(slice) {
+		fmt.Println("slice is full, can't be extented.")
+		return slice
+	}
+
 	n := len(slice)
 	slice = slice[0 : n+1]
 	slice[n] = element
 	return slice
 }
 
+func printLine() {
+	fmt.Println("-------------------------------------------------------------")
+}
+
+// Insert inserts the value into the slice at the specified index, which must be
+// in range.
+// The slice must have room for the new element.
+func Insert(slice []int, index, value int) []int {
+	// grow the slice by one element
+	slice = slice[0 : len(slice)+1]
+	// use copy to move the upper part of the slice out of the way and open a
+	// hole
+	copy(slice[index+1:], slice[index:])
+	// store the new value
+	slice[index] = value
+	// return a result
+	return slice
+}
+
+func Extend2(slice []int, element int) []int {
+	n := len(slice)
+	if n == cap(slice) {
+		// slice is full, must grow
+		// we double its size and add 1, so if the size is zero we still grow
+		newSlice := make([]int, len(slice), 2*len(slice)+1)
+		copy(newSlice, slice)
+		slice = newSlice
+	}
+	slice = slice[0 : n+1]
+	slice[n] = element
+	return slice
+}
