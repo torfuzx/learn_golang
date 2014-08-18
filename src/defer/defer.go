@@ -2,6 +2,7 @@
 
 defer
 -----
+
 - A defer statement pushes a function onto a list.
 - The list of saved call is executed after the surrounding functions returns.
 - Defer is commonly used to simplify functions that perform various clean-up
@@ -14,6 +15,27 @@ Three simple rules of defer:
   surrounding function returns.
 - 3. Deferred funcitons may read and assign to the returning funciton's named
   return values.
+
+panic
+-----
+
+- Stops the ordinary flow and begins paniking. When the function f calls panic,
+  execution of f stops, any defferred function in F are executed normally, and
+  then f returns to its caller. F then behaves likes a call to panic. The
+  process continues up the stack until all functions in the current goroutine
+  have returned, at which point the program crashes. Panic can be initiated by
+  invoking panic directly. They can also be caused by runtime errors, such as
+  out-of-bound array access.
+
+recover
+-------
+
+- A built-in function that regains controls of paniking goroutine.
+  Only useful inside deferred functions.
+- During normal executions, a call to recover will return nil and have no other
+  effects.
+- If the current goroutine is paniking, a call to recover will capture
+  the value given to panic and resume normal execution.
 
 
 */
@@ -37,6 +59,11 @@ func main() {
 	deferRule2()
 	i := deferRule3()
 	fmt.Println("value:", i)
+
+	// test panic and defer
+	println("-----------------------------------------------------------------")
+	f2()
+	fmt.Println("Returned normally from f.")
 }
 
 func f() (result int) {
@@ -97,4 +124,25 @@ func deferRule2() {
 func deferRule3() (i int) {
 	defer func() { i++ }()
 	return 1
+}
+
+func f2() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered in f", r)
+		}
+	}()
+	fmt.Println("calling g.")
+	g(0)
+	fmt.Println("Returned normally from g.")
+}
+
+func g(i int) {
+	if i > 3 {
+		fmt.Println("Panicking!")
+		panic(fmt.Sprintf("%v", i))
+	}
+	defer fmt.Println("Defer in g", i)
+	fmt.Println("Printing in g", i)
+	g(i + 1)
 }
