@@ -5,8 +5,30 @@ Strings
 
 - String is in effect a read-only slice of bytes.
 - String holds arbitrary bytes.
+- Indexing a string yields its bytes, not characters.
+- When we store a character value in a string, we store its byte-at-a-time
+  representation
+- Go source code is UTF-8, so the source code for the string literal is UTF-8
+  text. If that string literal contains no escape sequences, which a raw string
+  cannot, the constructed string will hold exactly the source text between the
+  quotes. Thus by definition and by construction, the raw string will always
+  contain a valid UTF-8 representation of its contents. Similarly, unless it
+  contains UTF-8-breaking escapes, a regular string literal will also contai
+  valid UTF-8
+- Strings can contain arbitrary bytes, but when constructed from string literals
+  those bytes are(almost always UTF=8)
+- A string literal, absent byte-level escapes, always holds valid UTF8 sequences
+- Those sequences represent Unicode code points, called runes
+- No guarantee is made in Go that characters in strings are Normalized.
 
-
+Rune
+----
+- Rune means the same as 'code point'
+- Go define teh rune as an alias of type int32
+- What you might think of as a character constant is called a rune constant
+- A for-range loop, unlike for loop, decodes one UTF-8 encoded rune on each
+  iteration. Each time aound the loop, the index of the loop is the starting
+  of the current rune, measured in bytes, and the code point is its value.
 */
 
 package main
@@ -22,10 +44,12 @@ import (
 func main() {
 	// Based on the go blog: Strings, bytes, runes and characters in Go
 	{
+		println("-------------------------------------------------------------")
 		// --------------------------------------------------------------------
 		// First set of examples that work on strings
 		// ---------------------------------------------------------------------
 		const sample = "\xbd\xb2\x3d\xbc\x20\xe2\x8c\x98"
+
 		fmt.Println("Println:")
 		fmt.Println(sample)
 
@@ -64,12 +88,17 @@ func main() {
 		// ---------------------------------------------------------------------
 		println("-------------------------------------------------------------")
 		sample_slice := []byte(sample)
+
+		fmt.Println("Println:")
+		fmt.Println(sample_slice)
+
 		fmt.Println("Byte loop with %x:")
 		for i := 0; i < len(sample_slice); i++ {
 			fmt.Printf("%x ", sample_slice[i])
 		}
 		fmt.Printf("\n")
 
+		// the %q will let the output be double-quoted string with Go syntax
 		fmt.Println("Byte loop with %q:")
 		for i := 0; i < len(sample_slice); i++ {
 			fmt.Printf("%q ", sample_slice[i])
@@ -82,17 +111,47 @@ func main() {
 		fmt.Println("Print with % x:")
 		fmt.Printf("% x\n", sample_slice)
 
+		// double quoted string
 		fmt.Println("Print with %q:")
 		fmt.Printf("%q\n", sample_slice)
 
 		fmt.Println("Print with %+q:")
 		fmt.Printf("%+q\n", sample_slice)
+
+		// --------------------------------------------------------------------
+		// Third set of examples
+		// ---------------------------------------------------------------------
 		println("-------------------------------------------------------------")
+		const placeOfInterest = `⌘`
+
+		fmt.Printf("plain string: ")
+		fmt.Printf("%s", placeOfInterest)
+		fmt.Printf("\n")
+
+		fmt.Printf("quoted string: ")
+		fmt.Printf("%+q", placeOfInterest)
+		fmt.Printf("\n")
+
+		fmt.Printf("hex bytes: ")
+		for i := 0; i < len(placeOfInterest); i++ {
+			fmt.Printf("%X ", placeOfInterest[i])
+		}
+		fmt.Printf("\n")
+
+		// --------------------------------------------------------------------
+		// Forth set of examples
+		// ---------------------------------------------------------------------
+		println("-------------------------------------------------------------")
+		const name = "中华\u0000人民共和国"
+		for index, runeValue := range name {
+			fmt.Printf("%#U starts at byte position %d\n", runeValue, index)
+		}
 	}
 
 	// String literals
 	// ---------------
 	{
+		println("-------------------------------------------------------------")
 		text1 := "\"what's that?\", he said" // interpreted string literal
 		text2 := `"what's that?", he said`   // raw strinf literal
 		radicals := "√ \u221A \U0000221a"    // square root
