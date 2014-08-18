@@ -1,20 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 )
 
-func main () {
+func main() {
 	// LITERALS
 	// --------
 	{
-		text1 := "\"what's that?\", he said"		// interpreted string literal
-		text2 := `"what's that?", he said`			// raw strinf literal
-		radicals := "√ \u221A \U0000221a"	// square root
+		text1 := "\"what's that?\", he said" // interpreted string literal
+		text2 := `"what's that?", he said`   // raw strinf literal
+		radicals := "√ \u221A \U0000221a"    // square root
 
 		fmt.Println(text1)
 		fmt.Println(text2)
@@ -25,7 +25,7 @@ func main () {
 	// ---------------
 	{
 		book := "The Spirit Level" +
-				" by Richard Wilkinson"
+			" by Richard Wilkinson"
 		book += " and Kate Pickett"
 		fmt.Println(book)
 		fmt.Println("Josey" < "José", "Josey" == "José")
@@ -34,7 +34,7 @@ func main () {
 	// Convert a single character to a one-charater string
 	{
 		æs := ""
-		for _, char := range []rune {
+		for _, char := range []rune{
 			'æ',
 			0xE6,
 			0346,
@@ -45,13 +45,13 @@ func main () {
 			fmt.Printf("[0x%X '%c'] ", char, char)
 			æs += string(char)
 		}
-		fmt.Println("");
+		fmt.Println("")
 		fmt.Println(æs)
 	}
 
 	{
 		var buffer bytes.Buffer
-		for _, piece := range []rune {
+		for _, piece := range []rune{
 			'æ',
 			0xE6,
 			0346,
