@@ -4,7 +4,8 @@ import (
 	"fmt"
 )
 
-type Point struct {x, y, z int}
+type Point struct{ x, y, z int }
+
 func (point Point) String() string {
 	return fmt.Sprintf("(%d,%d,%d)", point.x, point.y, point.z)
 }
@@ -12,10 +13,10 @@ func (point Point) String() string {
 func main() {
 	{
 		massFotPlanet := make(map[string]float64) // same as map[string]float{}
-		massFotPlanet["Mercury"] 	= 0.06
-		massFotPlanet["Venus"] 		= 0.82
-		massFotPlanet["Earth"] 		= 1.00
-		massFotPlanet["Mars"] 		= 0.11
+		massFotPlanet["Mercury"] = 0.06
+		massFotPlanet["Venus"] = 0.82
+		massFotPlanet["Earth"] = 1.00
+		massFotPlanet["Mars"] = 0.11
 		fmt.Println(massFotPlanet)
 	}
 
@@ -23,7 +24,7 @@ func main() {
 		triangle := make(map[*Point]string, 3)
 		triangle[&Point{89, 47, 27}] = "α"
 		triangle[&Point{86, 65, 86}] = "β"
-		triangle[&Point{7, 44, 45}]  =  "γ"
+		triangle[&Point{7, 44, 45}] = "γ"
 		fmt.Println(triangle)
 	}
 
@@ -35,9 +36,9 @@ func main() {
 	}
 
 	{
-		populationForCity := map[string]int {
-			"Istanbul" : 10620000,
-			"Mumbai": 12690000,
+		populationForCity := map[string]int{
+			"Istanbul": 10620000,
+			"Mumbai":   12690000,
 			"Shanghai": 13680000,
 		}
 		for city, population := range populationForCity {
@@ -53,9 +54,9 @@ func main() {
 	}
 
 	{
-		populationForCity := map[string]int {
-			"Istanbul" : 10620000,
-			"Mumbai": 12690000,
+		populationForCity := map[string]int{
+			"Istanbul": 10620000,
+			"Mumbai":   12690000,
 			"Shanghai": 13680000,
 		}
 
@@ -71,6 +72,3 @@ func main() {
 		fmt.Printf("%q is in the map == %t\n", city, present)
 	}
 }
-
-
-

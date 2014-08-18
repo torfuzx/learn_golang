@@ -61,11 +61,11 @@ func main() {
 	}
 
 	{
-		//		printLine()
-		//		println("Delete without preserving order:")
-		//		slice := []string{"a1", "a2", "a3", "a4", "b1", "b2", "a5", "a6", "a7"}
-		//		slice[4], slice = slice[len(slice)-1], slice[:len(slice)-1]
-		//		fmt.Println(slice)
+//		printLine()
+//		println("Delete without preserving order:")
+//		slice := []string{"a1", "a2", "a3", "a4", "b1", "b2", "a5", "a6", "a7"}
+//		slice[4], slice = slice[len(slice)-1], slice[:len(slice)-1]
+//		fmt.Println(slice)
 	}
 
 	{
@@ -118,7 +118,7 @@ func main() {
 	{
 		printLine()
 		fmt.Println("Pop:")
-
+		
 		slice := []int{1, 2, 3, 4, 6, 7, 8}
 		var x int // used to save the poped element
 
