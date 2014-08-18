@@ -114,6 +114,57 @@ func main() {
 			fmt.Println("address of 0th element: ", &slice[0])
 		}
 	}
+
+	{
+		// test the Append function
+		printLine()
+		slice := []int{0, 1, 2, 3, 4}
+		fmt.Println(slice)
+		slice = Append(slice, 5, 6, 7, 8)
+		fmt.Println(slice)
+
+		slice1 := []int{0, 1, 2, 3, 4}
+		slice2 := []int{55, 66, 77}
+		fmt.Println(slice1)
+		slice1 = Append(slice1, slice2...) // the '...' is esstential
+		fmt.Println(slice1)
+	}
+
+	{
+		printLine()
+		slice1 := []int{0, 1, 2, 3, 4}
+		slice2 := []int{55, 66, 77, 88}
+		fmt.Println(slice)
+		slice1 = Append2(slice1, slice2...)
+		fmt.Println(slice1)
+	}
+
+	{
+		// Test the built-in append function
+		printLine()
+		// Create a cpuple of starter slices
+		slice := []int{1, 2, 3}
+		slice2 := []int{55, 66, 77}
+		fmt.Println("start slice: ", slice)
+		fmt.Println("start slice2:", slice2)
+
+		// add an item to a slice
+		slice = append(slice, 4)
+		fmt.Println("Add one item:", slice)
+
+		// add an item to another
+		slice = append(slice, slice2...)
+		fmt.Println("Add one slice: ", slice)
+
+		// make a copy of a slice (of int)
+		slice3 := append([]int(nil), slice...)
+		fmt.Println("Copy a slice:", slice3)
+
+		// copy a slice to the end of itself
+		fmt.Println("Before append to self: ", slice)
+		slice = append(slice, slice...)
+		fmt.Println("After append to self:", slice)
+	}
 }
 
 func AddOneToEachElement(slice []byte) {
@@ -189,5 +240,32 @@ func Extend2(slice []int, element int) []int {
 	}
 	slice = slice[0 : n+1]
 	slice[n] = element
+	return slice
+}
+
+func Append(slice []int, items ...int) []int {
+	for _, item := range items {
+		slice = Extend2(slice, item)
+	}
+	return slice
+}
+
+// Appends the elements to the slice
+// efficient version
+// append the a series of ints to the slice, return the appended slice
+func Append2(slice []int, elements ...int) []int {
+	n := len(slice)
+	total := len(slice) + len(elements)
+
+	if total > cap(slice) {
+		// If the capacity can't allow the new elements to be appened,
+		// reallocate. Grow to 1.5 times the new size, so we can still grow.
+		newSize := total*3/2 + 1
+		newSlice := make([]int, total, newSize)
+		copy(newSlice, slice) // transfer the contents
+		slice = newSlice      // replace with the expanded self
+	}
+	slice = slice[:total]
+	copy(slice[n:], elements)
 	return slice
 }
