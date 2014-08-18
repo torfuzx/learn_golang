@@ -127,6 +127,8 @@ func deferRule3() (i int) {
 }
 
 func f2() {
+	// if we remove this defer statement, the panic is not recovered and reaches
+	// the top of the goroutine's call stack,terminating the program.
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Recovered in f", r)
