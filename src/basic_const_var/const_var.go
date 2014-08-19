@@ -2,37 +2,39 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"reflect"
+	"strings"
 )
 
-type  BitFlag int
+type BitFlag int
+
 const (
-	Active BitFlag = 1 << iota						// 1 << 0 == 1
-	Send		// implictly 'BitFlag = 1 << iota'	// 1 << 1 == 2
-	Receive		// implictly 'BitFlag = 1 << iota'	// 1 << 2 == 4
+	Active  BitFlag = 1 << iota // 1 << 0 == 1
+	Send                        // implictly 'BitFlag = 1 << iota'	// 1 << 1 == 2
+	Receive                     // implictly 'BitFlag = 1 << iota'	// 1 << 2 == 4
 )
+
 func (flag BitFlag) String() string {
 	var flags []string
 
-	if flag & Active == Active {
+	if flag&Active == Active {
 		flags = append(flags, "Active")
 	}
 
-	if flag & Send == Send {
+	if flag&Send == Send {
 		flags = append(flags, "Send")
 	}
 
-	if flag & Receive == Receive {
+	if flag&Receive == Receive {
 		flags = append(flags, "Receive")
 	}
-	if len(flags) > 0 {// int(flag) is used to prevent infinite loop, very important
+	if len(flags) > 0 { // int(flag) is used to prevent infinite loop, very important
 		return fmt.Sprintf("%d(%s)", int(flag), strings.Join(flags, "|"))
 	}
-	return  "0()"
+	return "0()"
 }
 
-func main () {
+func main() {
 	// VARIABLES & CONSTANTS
 	// ---------------------
 	const limit = 512
@@ -60,24 +62,24 @@ func main () {
 	// the following three groups has the same effect
 	{
 		{ // 1.
-			const Cyan 		= 0
-			const Magenta 	= 1
-			const Yellow	= 2
+			const Cyan = 0
+			const Magenta = 1
+			const Yellow = 2
 			fmt.Println("First const declaration method - Cyan:%d Magenta:%d Yellow:%d", Cyan, Magenta, Yellow)
 		}
 		{ // 2.
 			const (
-				Cyan	= 0
+				Cyan    = 0
 				Magenta = 1
-				Yellow	= 2
+				Yellow  = 2
 			)
 			fmt.Println("Second const declaration method - Cyan:%d Magenta:%d Yellow:%d", Cyan, Magenta, Yellow)
 		}
 		{ // 3.
 			const (
-				Cyan = iota	// 0
-				Magenta		// 1
-				Yellow		// 2
+				Cyan    = iota // 0
+				Magenta        // 1
+				Yellow         // 2
 			)
 			fmt.Sprintln("Third declaration method - Cyan:%d Magenta:%d Yellow:%d", Cyan, Magenta, Yellow)
 		}
@@ -88,8 +90,6 @@ func main () {
 
 	// BOOLEAN VALUES & EXPRESSIONS
 	// ----------------------------
-
-
 
 	// NUMERIC TYPES
 	// -------------
@@ -105,7 +105,3 @@ func main () {
 
 	// INTEGER TYPE
 }
-
-
-
-

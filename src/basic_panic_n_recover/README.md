@@ -1,0 +1,4 @@
+Panic and recover
+-----------------
+
+The panic and recover functions behave similarly to excetptions in some other languages in the a panic causes the program to begin unwinding and recover can stop it. Deferred functioins are still executed as the stack unwinds. If recover is called inside such a deferred function, the stack stops unwinding and recover returns the value(as an interface{}) that was passed to panic. The runtime will also panic in extraordinary circumstances, such as indexing an array or slice out-of-bounds. If a panic causes the stack to unwind outside any executing goroutine(e.g. main or the top level function given to go fail to recover from it), the program exits will a stack trace of all executing goroutines. A panic cannot be recovered by a different goroutine. 
