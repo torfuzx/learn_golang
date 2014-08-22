@@ -19,7 +19,7 @@ any other synchronization.
 */
 
 package main
-
+	
 import (
 	"fmt"
 )

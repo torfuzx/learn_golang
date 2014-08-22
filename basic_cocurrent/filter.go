@@ -1,21 +1,22 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"flag" // command-line flag parsing
-	"strings"
-	"runtime" // interact with go's runtime system
-	"path/filepath"
-	"os"
 	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 )
 
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU()) // use all the machine's core
-
-	// set the output flags for the standard logger, this will remove the formatting
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	
+	
 	log.SetFlags(0)
 
+	// set the output flags for the standard logger, this will remove the formatting
 	algorithm, minSize, maxSize, suffixes, files := handleCommandLine()
 
 	if algorithm == 1 {
@@ -32,14 +33,14 @@ func main() {
 	}
 }
 
-func handleCommandLine() (algorithm int, minSize, maxSize int64, suffixes, files[]string) {
+func handleCommandLine() (algorithm int, minSize, maxSize int64, suffixes, files []string) {
 	if len(os.Args) == 1 {
 		fmt.Printf("usage: %s -algorithm <int> -min <int64> -max <int64> -suffixes <string>\n", filepath.Base(os.Args[0]))
 		os.Exit(1)
 	}
 
 	// defines a integer flag -algorithm, stored in the pointer algorithm
-	flag.IntVar(&algo	rithm, "algorithm", 1, "1 or 2")
+	flag.IntVar(&algorithm, "algorithm", 1, "1 or 2")
 	// defines a int64 flag -min stored in the pointer minSize
 	flag.Int64Var(&minSize, "min", -1, "minimum file size(-1 means no minimum)")
 	// defines a int64 flag -max stored in the pointer maxSize
@@ -68,9 +69,6 @@ func handleCommandLine() (algorithm int, minSize, maxSize int64, suffixes, files
 	return algorithm, minSize, maxSize, suffixes, files
 }
 
-
-
-
 // print the result
 func sink(in <-chan string) {
 	for filename := range in {
@@ -95,25 +93,25 @@ func sources(files []string) <-chan string {
 
 // receives the suffix slice as constraint and returns a channel of type chan string
 // transfering the filenames
-func filterSuffixes(suffixes []string, in <-chan string ) <-chan string {
+func filterSuffixes(suffixes []string, in <-chan string) <-chan string {
 	// create a channel with a pre-configured capacity, which makes the channekl
 	// works in a non-blocking asymchronous manner
 	// make the buffer the same size as for files to maximize throughput, win time via space
 	out := make(chan string, cap(in))
 
 	// create a go routine by invoking a temp created anonymous function
-	go func () {
+	go func() {
 		for filename := range in {
 			if len(suffixes) == 0 {
-				out <- filename	// send the filename to the channel, blocking manner, if non suffix rule is set, then pass the suffix checking and directly send the file
+				out <- filename // send the filename to the channel, blocking manner, if non suffix rule is set, then pass the suffix checking and directly send the file
 				continue
 			}
 
 			// check the suffix
 			ext := strings.ToLower(filepath.Ext(filename))
-			for _,suffix := range suffixes {
+			for _, suffix := range suffixes {
 				if ext == suffix {
-					out <- filename	// send the filename that meet the suffix constraint
+					out <- filename // send the filename that meet the suffix constraint
 					break
 				}
 			}
@@ -133,10 +131,10 @@ func filterSize(minimum, maximum int64, in <-chan string) <-chan string {
 	out := make(chan string, cap(in))
 
 	// creat a goroutine by invoking a temporary anonymous function
-	go func () {
+	go func() {
 		for filename := range in {
 			if minimum == -1 && maximum == -1 {
-				out <-filename // send method(blocking)
+				out <- filename // send method(blocking)
 				continue
 			}
 
@@ -147,7 +145,7 @@ func filterSize(minimum, maximum int64, in <-chan string) <-chan string {
 
 			size := finfo.Size()
 			if (minimum == -1 || minimum > -1 && minimum <= size) && (maximum == -1 || maximum > -1) {
-				out <- filename	// send method(blocking)
+				out <- filename // send method(blocking)
 			}
 		}
 		close(out)
