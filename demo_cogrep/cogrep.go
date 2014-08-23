@@ -49,7 +49,6 @@ func init() {
 	defer file.Close()
 
 	log.SetOutput(file)
-	log.Println("This is a test entry")
 }
 
 func main() {
@@ -87,7 +86,7 @@ func main() {
 
 	// process the results in the main goroutine
 	for result := range chanResult {
-		fmt.Printf("%s:%d:%s\n", result.filename, result.lino, result.line)
+		fmt.Printf("%s:%d:%s", result.filename, result.lino, result.line)
 	}
 }
 
