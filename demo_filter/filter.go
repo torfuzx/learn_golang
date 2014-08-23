@@ -1,3 +1,8 @@
+/*!
+
+
+
+*/
 package main
 
 import (
@@ -10,22 +15,30 @@ import (
 	"strings"
 )
 
+type result struct {
+	name   string
+	size   int64
+	suffix string
+}
+
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	
-	
-	log.SetFlags(0)
 
 	// set the output flags for the standard logger, this will remove the formatting
-	algorithm, minSize, maxSize, suffixes, files := handleCommandLine()
+	// as zero doesn't represent any predefined formatting
+	log.SetFlags(0)
+
+	algorithm, minSize, maxSize, suffixes, files := parseCommandLine()
 
 	if algorithm == 1 {
 		sink(filterSize(minSize, maxSize, filterSuffixes(suffixes, sources(files))))
 	} else {
 		// goroutine #1
 		channel1 := sources(files)
+
 		// goroutine #2
 		channel2 := filterSuffixes(suffixes, channel1)
+
 		// goroutine #3
 		channel3 := filterSize(minSize, maxSize, channel2)
 
@@ -33,23 +46,28 @@ func main() {
 	}
 }
 
-func handleCommandLine() (algorithm int, minSize, maxSize int64, suffixes, files []string) {
-	if len(os.Args) == 1 {
-		fmt.Printf("usage: %s -algorithm <int> -min <int64> -max <int64> -suffixes <string>\n", filepath.Base(os.Args[0]))
-		os.Exit(1)
-	}
-
+// Parse the command line, and adjust argument values.
+func parseCommandLine() (algorithm int, minSize, maxSize int64, suffixes, files []string) {
 	// defines a integer flag -algorithm, stored in the pointer algorithm
-	flag.IntVar(&algorithm, "algorithm", 1, "1 or 2")
+	flag.IntVar(&algorithm, "algorithm", 1, "1 [pipe style] or 2 [goroutine style]")
 	// defines a int64 flag -min stored in the pointer minSize
-	flag.Int64Var(&minSize, "min", -1, "minimum file size(-1 means no minimum)")
+	flag.Int64Var(&minSize, "min", -1, "minimum file size, default: -1 for no limit)")
 	// defines a int64 flag -max stored in the pointer maxSize
-	flag.Int64Var(&maxSize, "max", -1, "maximum file size(-1 means no maximum)")
+	flag.Int64Var(&maxSize, "max", -1, "maximum file size, default: -1 for no limit)")
 	// defines a string flag -suffixes stored in the pointer suffixesOpt
 	var suffixesOpt *string = flag.String("suffixes", "", "comma separated list of file suffixes")
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: %s -algorithm <int> -min <int64> -max <int64> -suffixes <string>\n", filepath.Base(os.Args[0]))
+		flag.PrintDefaults()
+		os.Exit(2)
+	}
+
 	// parse the command line into defined vars
 	flag.Parse()
+	if flag.NFlag() == 0 {
+		flag.Usage()
+	}
 
 	if algorithm != 1 && algorithm != 2 {
 		algorithm = 1
@@ -69,17 +87,11 @@ func handleCommandLine() (algorithm int, minSize, maxSize int64, suffixes, files
 	return algorithm, minSize, maxSize, suffixes, files
 }
 
-// print the result
-func sink(in <-chan string) {
-	for filename := range in {
-		fmt.Println(filename)
-	}
-}
-
-// receives a slice of strting and returns an channel of type chan string
-// the contents of the files slice will be send to the channel in turn
+// Receives a slice of string and returns an receive-only channel for string.
+// The contents of the files slice will be send to the channel sequentially.
+// Channel #1: transfering all the original file names.
 func sources(files []string) <-chan string {
-	// create the channel
+	// create a buffered channel
 	out := make(chan string, 1000)
 	// invoking a temp anonymous goroutine
 	go func() {
@@ -91,10 +103,10 @@ func sources(files []string) <-chan string {
 	return out
 }
 
-// receives the suffix slice as constraint and returns a channel of type chan string
-// transfering the filenames
+// Receives the suffix slice as constraint and returns a string channel
+// Channel #2: Tranfering all file names whose suffixes are not on blacklist.
 func filterSuffixes(suffixes []string, in <-chan string) <-chan string {
-	// create a channel with a pre-configured capacity, which makes the channekl
+	// create a channel with a pre-configured capacity, which makes the channel
 	// works in a non-blocking asymchronous manner
 	// make the buffer the same size as for files to maximize throughput, win time via space
 	out := make(chan string, cap(in))
@@ -103,7 +115,10 @@ func filterSuffixes(suffixes []string, in <-chan string) <-chan string {
 	go func() {
 		for filename := range in {
 			if len(suffixes) == 0 {
-				out <- filename // send the filename to the channel, blocking manner, if non suffix rule is set, then pass the suffix checking and directly send the file
+				// send the file names to the channel, blocking manner, if none
+				// suffix rule is set, then pass the suffix checking and
+				// directly send the file
+				out <- filename
 				continue
 			}
 
@@ -122,7 +137,8 @@ func filterSuffixes(suffixes []string, in <-chan string) <-chan string {
 	return out
 }
 
-// receives the filter constraints and a chan string channel, and return its own channel
+// Receives the filter constraints and a chan string channel, and return its own channel
+// Channel #3: transfering result after applying the size limits.
 func filterSize(minimum, maximum int64, in <-chan string) <-chan string {
 	// make a channel with a specified capacity, specify the capacity makes the
 	// channel works in a asymchronous way, if there are used space in the buffer
@@ -151,4 +167,11 @@ func filterSize(minimum, maximum int64, in <-chan string) <-chan string {
 		close(out)
 	}()
 	return out
+}
+
+// Print the result
+func sink(in <-chan string) {
+	for filename := range in {
+		fmt.Println(filename)
+	}
 }
