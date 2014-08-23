@@ -3,13 +3,18 @@
 Package log
 -----------
 
-Package log implements a simple loogging package. It defines a type, Logger, 
+Package log implements a simple loogging package. It defines a type, Logger,
 with methods for formatting output. It also has a predefined 'standard' Logger
-accessible through heloerrr functions Printf, Println, Fatalf, Fatalln, and 
+accessible through heloerrr functions Printf, Println, Fatalf, Fatalln, and
 Panicf, Panicln, which are easierr to use than creating a Logger manually. That
-logger writes to standard error and prints the date and time of each logger 
+logger writes to standard error and prints the date and time of each logger
 message. The panic functions call panic after writing the log mesage.
 
+
+- Logger
+	- A logger represent an active logging object that generates lines of output to a io.Writer.
+	- Each logging operation makes a single call to the Writer's Write  method.
+	- A logger can be used simultanenously from multiple goroutines; it gurantees to serialize access to the Writer.
 
 */
 
