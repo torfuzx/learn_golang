@@ -1,13 +1,13 @@
 package main
 
 import (
-	"regexp"
 	"fmt"
+	"regexp"
 )
 
 func main() {
 	{
-		names := []string {
+		names := []string{
 			// English Examples
 			"Elizabeth Blackshaw",
 			"Carl William Brandt",
@@ -58,4 +58,3 @@ func main() {
 
 	}
 }
-

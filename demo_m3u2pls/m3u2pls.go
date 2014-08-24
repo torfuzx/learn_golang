@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"strings"
-	"os"
-	"path/filepath"
 	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -25,9 +25,9 @@ func main() {
 }
 
 type Song struct {
-	Title string
+	Title    string
 	Filename string
-	Seconds int
+	Seconds  int
 }
 
 func readM3uPlaylist(data string) (songs []Song) {
@@ -38,7 +38,7 @@ func readM3uPlaylist(data string) (songs []Song) {
 			continue
 		}
 
-		if strings.HasPrefix(line, "#EXTINF:" ) {
+		if strings.HasPrefix(line, "#EXTINF:") {
 			song.Title, song.Seconds = parseExtinfLine(line)
 		} else {
 			song.Filename = strings.Map(mapPlatformDirSeparator, line)
@@ -58,7 +58,7 @@ func parseExtinfLine(line string) (title string, seconds int) {
 		line := line[i:]
 
 		if j := strings.Index(line, separator); j > -1 {
-			title = line[j + len(separator):]
+			title = line[j+len(separator):]
 			var err error
 			if seconds, err = strconv.Atoi(line[:j]); err != nil {
 				log.Printf("failed to read the duration for '%s': %v\n", title, err)
@@ -67,7 +67,6 @@ func parseExtinfLine(line string) (title string, seconds int) {
 	}
 	return title, seconds
 }
-
 
 func mapPlatformDirSeparator(char rune) rune {
 	if char == '/' || char == '\\' {

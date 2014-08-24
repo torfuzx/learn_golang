@@ -35,7 +35,6 @@ func TestSafeMap(t *testing.T) {
 
 	// Cocurrent Deleter
 	// -------------------------------------------------------------------------
-
 	waiter.Add(1)
 	go func () {
 		for _, i := range deleted {
@@ -50,7 +49,6 @@ func TestSafeMap(t *testing.T) {
 
 	// Cocurrent Finder
 	// -------------------------------------------------------------------------
-
 	waiter.Add(1)	// increment the WaitGroup counter
 	go func () {
 		for _, i := range deleted {

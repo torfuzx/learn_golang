@@ -2,18 +2,18 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"image/color"
+	"math"
 )
 
 type composer struct {
-	name			string
-	birthYear 		int
+	name      string
+	birthYear int
 }
 
 type rectangle struct {
 	x0, y0, x1, y1 int
-	fill color.RGBA
+	fill           color.RGBA
 }
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 
 		py := &y
 		fmt.Printf("x: %p -> %d; y: %p -> %d; py: %v; *py: %d\n", &x, x, &y, y, py, *py)
-		*py ++
+		*py++
 		fmt.Printf("x: %p -> %d; y: %p -> %d; py: %v; *py: %d\n", &x, x, &y, y, py, *py)
 		fmt.Println()
 	}
@@ -87,7 +87,7 @@ func main() {
 		antónio := composer{"António Teixeira", 1707}
 		fmt.Println(antónio)
 
-		anges := new(composer)		// pointer to composer
+		anges := new(composer) // pointer to composer
 		anges.name, anges.birthYear = "Agnes Zimmermann", 1845
 
 		julia := &composer{}
@@ -101,7 +101,7 @@ func main() {
 	}
 
 	{
-		grades := []int {87, 55, 43, 71, 60, 43, 32, 19, 63}
+		grades := []int{87, 55, 43, 71, 60, 43, 32, 19, 63}
 		inflate(grades, 3)
 		fmt.Println(grades)
 	}

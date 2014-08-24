@@ -5,26 +5,26 @@ import (
 )
 
 type Person struct {
-	Title 		string
-	Fornames 	[]string
-	Surname		string
+	Title    string
+	Fornames []string
+	Surname  string
 }
 
-type Author1 struct  {
-	Names 		Person
-	Title 		[]string
-	YearBorn 	int
+type Author1 struct {
+	Names    Person
+	Title    []string
+	YearBorn int
 }
 
 type Author2 struct {
 	Person
-	Title []string
+	Title    []string
 	YearBorn int
 }
 
 func main() {
 	{
-		points := [][2]int {{4, 6}, {}, {-7, 11}, {15, 17}, {14, -8}}
+		points := [][2]int{{4, 6}, {}, {-7, 11}, {15, 17}, {14, -8}}
 		for _, point := range points {
 			fmt.Printf("(%d, %d)", point[0], point[1])
 		}
@@ -32,7 +32,7 @@ func main() {
 	}
 
 	{
-		points := []struct {x, y int} {{4, 6}, {}, {-7, 11}, {15, 17}, {14, -8}}
+		points := []struct{ x, y int }{{4, 6}, {}, {-7, 11}, {15, 17}, {14, -8}}
 		for _, point := range points {
 			fmt.Printf("(%d, %d)", point.x, point.y)
 		}
@@ -41,8 +41,8 @@ func main() {
 
 	{
 		author1 := Author1{
-		Person{
-			"Mr", []string{"Robert", "Louis", "Balfour"}, "Stevenson"},
+			Person{
+				"Mr", []string{"Robert", "Louis", "Balfour"}, "Stevenson"},
 			[]string{"Kiddnapped", "Treasure Island"},
 			1850,
 		}
@@ -56,4 +56,3 @@ func main() {
 		fmt.Printf("%#v\n", author1)
 	}
 }
-

@@ -14,7 +14,7 @@ func main() {
 	// run it synchronously
 	f("direct")
 
-	// invoke in a goroutine, will be execute cocurrently with the calling 
+	// invoke in a goroutine, will be execute cocurrently with the calling
 	// goroutine
 	go f("go routine")
 

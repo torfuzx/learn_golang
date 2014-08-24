@@ -2,22 +2,22 @@ package main
 
 import (
 	"fmt"
-	"sort"
-	"net/http"
-	"strings"
 	"log"
+	"net/http"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 const (
-	pageTop 	= `
+	pageTop = `
 		<!DOCTYPE HTML><html><head>
 		<style>.error{color:#FF0000;}</style></head><title>Statistics</title>
 		<body><h3>Statistics</h3>
 		<p>Computes basic statistics for a given list of numbers</p>
 		`
-	pageButtom 	= `</body></html>`
-	form = `
+	pageButtom = `</body></html>`
+	form       = `
 		<form action ="/" method="POST">
 		<label for="numbers">Numbers (comma or space-separated): </label><br/>
 		<input type="text" name="numbers" size="30"><br/>
@@ -28,9 +28,9 @@ const (
 )
 
 type statistics struct {
-	numbers	[]float64
-	mean float64
-	median float64
+	numbers []float64
+	mean    float64
+	median  float64
 }
 
 func getStats(numbers []float64) (stats statistics) {
@@ -41,18 +41,18 @@ func getStats(numbers []float64) (stats statistics) {
 	return stats
 }
 
-func sum (numbers []float64) (total float64) {
-	for _,x := range numbers {
+func sum(numbers []float64) (total float64) {
+	for _, x := range numbers {
 		total += x
 	}
 	return total
 }
 
-func median (numbers []float64) float64 {
+func median(numbers []float64) float64 {
 	middle := len(numbers) / 2
 	result := numbers[middle]
-	if len(numbers) % 2 == 0 {
-		result = (result + numbers[middle - 1]) / 2
+	if len(numbers)%2 == 0 {
+		result = (result + numbers[middle-1]) / 2
 	}
 	return result
 }
@@ -65,7 +65,7 @@ func main() {
 }
 
 func homePage(writer http.ResponseWriter, request *http.Request) {
-	err := request.ParseForm ()
+	err := request.ParseForm()
 	fmt.Fprint(writer, pageTop, form)
 
 	if err != nil {

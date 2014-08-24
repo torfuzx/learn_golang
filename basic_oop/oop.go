@@ -8,33 +8,33 @@
 package main
 
 import (
-	"image/color"
 	"fmt"
+	"image/color"
+	"io"
 	"strings"
 	"unicode"
-	"io"
 )
 
 // -----------------------------------------------------------------------------
 type ColoredPoint struct {
-	color.Color		// anoymous field (embeded)
-	x, y int		// named field (aggregated)
+	color.Color     // anoymous field (embeded)
+	x, y        int // named field (aggregated)
 }
 
 // -----------------------------------------------------------------------------
-type RuneForRuneFunc func (rune) rune
+type RuneForRuneFunc func(rune) rune
 
 // -----------------------------------------------------------------------------
 type Count int
-func (count *Count) Increment() {*count++}
-func (count *Count) Decrement() {*count--}
-func (count Count) IsZero() bool {return count == 0}
 
+func (count *Count) Increment()  { *count++ }
+func (count *Count) Decrement()  { *count-- }
+func (count Count) IsZero() bool { return count == 0 }
 
 // -----------------------------------------------------------------------------
 type Part struct {
-	Id 		int
-	Name	string
+	Id   int
+	Name string
 }
 
 func (part *Part) LowerCase() {
@@ -49,24 +49,24 @@ func (part Part) String() string {
 	return fmt.Sprintf("<<%d %q>>", part.Id, part.Name)
 }
 
-func (part Part) HasPrefix(prefix string) bool{
+func (part Part) HasPrefix(prefix string) bool {
 	return strings.HasPrefix(part.Name, prefix)
 }
 
 // -----------------------------------------------------------------------------
 type Item struct {
-	id 			string
-	price 		float64
-	quantity 	int
+	id       string
+	price    float64
+	quantity int
 }
 
-func (item *Item) Cost() float64{
+func (item *Item) Cost() float64 {
 	return item.price * float64(item.quantity)
 }
 
 type SpeicialItem struct {
-	Item		 		// anoymous (embeded)
-	catalogId	int		// named field (aggregation)
+	Item          // anoymous (embeded)
+	catalogId int // named field (aggregation)
 }
 
 type LuxuryItem struct {
@@ -84,7 +84,7 @@ func (item *LuxuryItem) Cost() float64 {
 
 type Place struct {
 	latitude, longitude float64
-	Name				string
+	Name                string
 }
 
 // constuctor, to be called explicitly
@@ -108,12 +108,12 @@ func (place *Place) Longitude() float64 {
 }
 
 // setter of longitude, no return value
-func (place* Place) SetLongitude (longitude float64) {
+func (place *Place) SetLongitude(longitude float64) {
 	place.longitude = longitude
 }
 
 // print method
-func (place *Place) String() string{
+func (place *Place) String() string {
 	return fmt.Sprintf("(%.3f°, %.3f°) %q", place.latitude, place.longitude, place.Name)
 }
 
@@ -135,11 +135,13 @@ type Exchanger interface {
 type StringPair struct {
 	first, second string
 }
+
 func (pair *StringPair) Exchange() {
 	pair.first, pair.second = pair.second, pair.first
 }
 
 type Point [2]int
+
 func (point *Point) Exchange() {
 	point[0], point[1] = point[1], point[0]
 }
@@ -148,7 +150,7 @@ func (pair StringPair) String() string {
 	return fmt.Sprintf("%q+%q", pair.first, pair.second)
 }
 
-func exchangeThese(exchangers...Exchanger) {
+func exchangeThese(exchangers ...Exchanger) {
 	for _, exchanger := range exchangers {
 		exchanger.Exchange()
 	}
@@ -182,7 +184,6 @@ func ToBytes(reader io.Reader, size int) ([]byte, error) {
 	}
 	return data[:n], nil // remove useless bytes
 }
-
 
 // -----------------------------------------------------------------------------
 type LowerCaser interface {
@@ -226,21 +227,20 @@ func fixCase(s string) string {
 	return string(chars)
 }
 
-
 // implements the interface UpperCaser
 func (pair *StringPair) UpperCase() {
-	pair.first 	= strings.ToUpper(pair.first)
+	pair.first = strings.ToUpper(pair.first)
 	pair.second = strings.ToUpper(pair.second)
 }
 
 func (pair *StringPair) LowerCase() {
-	pair.first 	= strings.ToLower(pair.first)
+	pair.first = strings.ToLower(pair.first)
 	pair.second = strings.ToLower(pair.second)
 }
 
 // implements the interface FixCaser
 func (pair *StringPair) FixCase() {
-	pair.first  = fixCase(pair.first)
+	pair.first = fixCase(pair.first)
 	pair.second = fixCase(pair.second)
 }
 
@@ -279,7 +279,7 @@ func main() {
 	{
 		// declare a signature that receive a rune as parameter and returns a rune
 		var removePunctuation RuneForRuneFunc
-		phrases := []string {"Day; dusk, and night.", "All day long"}
+		phrases := []string{"Day; dusk, and night.", "All day long"}
 		removePunctuation = func(char rune) rune {
 			if unicode.Is(unicode.Terminal_Punctuation, char) {
 				return -1
@@ -314,7 +314,6 @@ func main() {
 		fmt.Println(part, part.HasPrefix("w"))
 	}
 
-
 	// test the Item and SpicalItem types
 	// NOTE: any methods on the emebeded type can be called on the custom struct
 	// as if they were the struct's own methods
@@ -333,10 +332,10 @@ func main() {
 	{
 		part := Part{10001, "WRENCH"}
 
-		asStringV := Part.String		// effective signature: func(Part) string
-		asStringP := (*Part).String		// effective signature: func(*Part) string
-		hasPrefix := Part.HasPrefix		// effective signature: func(Part, string) bool
-		lower 	  := (*Part).LowerCase	// effective signature: func(*Part)
+		asStringV := Part.String    // effective signature: func(Part) string
+		asStringP := (*Part).String // effective signature: func(*Part) string
+		hasPrefix := Part.HasPrefix // effective signature: func(Part, string) bool
+		lower := (*Part).LowerCase  // effective signature: func(*Part)
 
 		sv := asStringV(part)
 		sp := asStringP(&part)
@@ -351,14 +350,14 @@ func main() {
 
 	// test interface
 	{
-		jekyll	:= StringPair{"Henry", "Jekyll"}
-		hyde	:= StringPair{"Edward", "Hyde"}
-		point 	:= Point{5, -3}
+		jekyll := StringPair{"Henry", "Jekyll"}
+		hyde := StringPair{"Edward", "Hyde"}
+		point := Point{5, -3}
 		fmt.Println("Before: ", jekyll, hyde, point)
 
-		jekyll.Exchange()	// treated as: (&jekyll).Exchange()
-		hyde.Exchange()		// treated as: (&hyde).Exchange()
-		point.Exchange()	// treated as: (&point).Exchange()
+		jekyll.Exchange() // treated as: (&jekyll).Exchange()
+		hyde.Exchange()   // treated as: (&hyde).Exchange()
+		point.Exchange()  // treated as: (&point).Exchange()
 		fmt.Println("After #1: ", jekyll, hyde, point)
 
 		exchangeThese(&jekyll, &hyde, &point)
@@ -368,8 +367,8 @@ func main() {
 	{
 		const size = 16
 		robert := &StringPair{"Robert L.", "Stevenson"}
-		david  := StringPair{"David", "Balfour"}
-		longname  := StringPair{"Thisisalongstringandwhatever", "hehe"}
+		david := StringPair{"David", "Balfour"}
+		longname := StringPair{"Thisisalongstringandwhatever", "hehe"}
 		for _, reader := range []io.Reader{robert, &david, &longname} {
 			raw, err := ToBytes(reader, size)
 			if err != nil {
@@ -389,8 +388,5 @@ func main() {
 
 		fmt.Println(toastRack, lobelia)
 
-
-
 	}
 }
-

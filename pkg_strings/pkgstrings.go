@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
-	"bytes"
 	"unicode"
 )
 
-func main () {
+func main() {
 	{
 		names := "Niccolò•Noël•Geoffrey•Amélie••Turlough•José"
 
@@ -77,7 +77,7 @@ func main () {
 			}
 			return char
 		}
-		removeNonAscii := func (char rune) rune {
+		removeNonAscii := func(char rune) rune {
 			if char > 127 {
 				return -1
 			}
@@ -114,6 +114,3 @@ func SimplifyWhiteSpace(s string) string {
 	}
 	return s
 }
-
-
-

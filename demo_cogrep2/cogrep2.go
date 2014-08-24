@@ -1,27 +1,26 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
-	"runtime"
+	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
-	"log"
-	"bufio"
-	"io"
-	"bytes"
+	"runtime"
 )
 
-
 type Result struct {
-	filename 	string
-	lino	 	int
-	line		string
+	filename string
+	lino     int
+	line     string
 }
 
 type Job struct {
 	filename string
-	results chan<- Result
+	results  chan<- Result
 }
 
 // this is where the hard work is taken, it's invoked by a doJob goroutine
@@ -40,7 +39,7 @@ func (job Job) Do(lineRx *regexp.Regexp) {
 
 	// the bufio.NewReader will return a new Reader with default buffer size
 	reader := bufio.NewReader(file)
-	for lino := 1; ;lino ++ {
+	for lino := 1; ; lino++ {
 		line, err := reader.ReadBytes('\n')
 		line = bytes.TrimRight(line, "\n\r")
 		if lineRx.Match(line) {
@@ -55,6 +54,7 @@ func (job Job) Do(lineRx *regexp.Regexp) {
 		}
 	}
 }
+
 var workers = runtime.NumCPU()
 
 func main() {
@@ -78,11 +78,11 @@ func main() {
 func commandLineFiles(files []string) []string {
 	if runtime.GOOS == "windows" {
 		args := make([]string, 0, len(files))
-		for _,name := range (files) {
+		for _, name := range files {
 			if matches, err := filepath.Glob(name); err != nil {
 				args = append(args, name)
-			} else if  matches != nil {
-				args = append(args, matches...)	// an example of append one slice to another slice
+			} else if matches != nil {
+				args = append(args, matches...) // an example of append one slice to another slice
 			}
 		}
 		return args
@@ -91,44 +91,43 @@ func commandLineFiles(files []string) []string {
 }
 
 func grep(lineRx *regexp.Regexp, filenames []string) {
-    jobs := make(chan Job, workers)
-    results := make(chan Result, minimum(1000, len(filenames)))
-    done := make(chan struct{}, workers)
+	jobs := make(chan Job, workers)
+	results := make(chan Result, minimum(1000, len(filenames)))
+	done := make(chan struct{}, workers)
 
-    go addJobs(jobs, filenames, results)
-    for i := 0; i < workers; i++ {
-        go doJobs(done, lineRx, jobs)
-    }
-    waitAndProcessResults(done, results)
+	go addJobs(jobs, filenames, results)
+	for i := 0; i < workers; i++ {
+		go doJobs(done, lineRx, jobs)
+	}
+	waitAndProcessResults(done, results)
 }
 
 func minimum(x int, ys ...int) int {
-    for _, y := range ys {
-        if y < x {
-            x = y
-        }
-    }
-    return x
+	for _, y := range ys {
+		if y < x {
+			x = y
+		}
+	}
+	return x
 }
 
-
 func addJobs(jobs chan<- Job, filenames []string, results chan<- Result) {
-    for _, filename := range filenames {
-        jobs <- Job{filename, results}
-    }
-    close(jobs)
+	for _, filename := range filenames {
+		jobs <- Job{filename, results}
+	}
+	close(jobs)
 }
 
 func doJobs(done chan<- struct{}, lineRx *regexp.Regexp, jobs <-chan Job) {
-    for job := range jobs {
-        job.Do(lineRx)
-    }
-    done <- struct{}{}
+	for job := range jobs {
+		job.Do(lineRx)
+	}
+	done <- struct{}{}
 }
 
-func waitAndProcessResults(done <-chan struct {}, results <-chan Result) {
+func waitAndProcessResults(done <-chan struct{}, results <-chan Result) {
 	for working := workers; working > 0; {
-		select {	// blocking
+		select { // blocking
 		case result := <-results:
 			fmt.Printf("%s:%d:%s\n", result.filename, result.lino, result.line)
 		case <-done:
@@ -136,17 +135,16 @@ func waitAndProcessResults(done <-chan struct {}, results <-chan Result) {
 		}
 	}
 
-	DONE:
-		for {
-			// non-blocking
-			select {
-			// if there are unhandled results in the results channel, then it will be processed here,
-			// the loop will continue until no more results in the results channel
-			case result := <-results:
-				fmt.Printf("%s:%d:%s\n", result.filename, result.lino, result.line)
-			default:
-				break DONE	// this will break from both the select and and for statement. to the position of DONE label above
-			}
+DONE:
+	for {
+		// non-blocking
+		select {
+		// if there are unhandled results in the results channel, then it will be processed here,
+		// the loop will continue until no more results in the results channel
+		case result := <-results:
+			fmt.Printf("%s:%d:%s\n", result.filename, result.lino, result.line)
+		default:
+			break DONE // this will break from both the select and and for statement. to the position of DONE label above
 		}
+	}
 }
-

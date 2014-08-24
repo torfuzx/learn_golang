@@ -5,7 +5,7 @@ import (
 	"unicode"
 )
 
-func main () {
+func main() {
 	fmt.Println(IsHexDigit('8'), IsHexDigit('X'), IsHexDigit('x'), IsHexDigit('b'), IsHexDigit('B'))
 }
 

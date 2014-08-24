@@ -10,8 +10,6 @@ type Animal interface {
 
 // -----------------------------------------------------------------------------
 type Dog struct {
-
-
 }
 
 // satisfy the Animal interface
@@ -21,7 +19,6 @@ func (dog Dog) Speak() string {
 
 // -----------------------------------------------------------------------------
 type Cat struct {
-
 }
 
 // satisfy the Animal interface
@@ -32,7 +29,6 @@ func (cat Cat) Speak() string {
 // -----------------------------------------------------------------------------
 
 type Llama struct {
-
 }
 
 // satisfy the Animal interface
@@ -42,15 +38,14 @@ func (llama Llama) Speak() string {
 
 // -----------------------------------------------------------------------------
 type JavaProgrammer struct {
-
 }
 
 // satisfy the Animal interface
 func (j JavaProgrammer) Speak() string {
 	return "Design Patterns!"
 }
-// -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
 
 func main() {
 	animals := []Animal{Dog{}, Cat{}, Llama{}, JavaProgrammer{}}
@@ -58,4 +53,3 @@ func main() {
 		fmt.Println(animal.Speak())
 	}
 }
-

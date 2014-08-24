@@ -7,17 +7,18 @@ import (
 )
 
 type polar struct {
-	radius 	float64
-	θ		float64
+	radius float64
+	θ      float64
 }
 
 type cartesian struct {
-	x	float64
-	y	float64
+	x float64
+	y float64
 }
 
 var prompt = "Enter a radius and an angle (in degrees), e.g., 12.5 90, " + "or %s to quit."
-func init () {
+
+func init() {
 	if runtime.GOOS == "windows" {
 		prompt = fmt.Sprintf(prompt, "Ctrl + Z, Enter")
 	} else { // Unix-like
@@ -25,7 +26,7 @@ func init () {
 	}
 }
 
-func main () {
+func main() {
 	// crate a channel used for transfering objects of polar struct
 	questions := make(chan polar)
 	// ensure the channel get destroyed/closed properly after use
@@ -43,7 +44,7 @@ func main () {
 func createSolver(questions chan polar) chan cartesian {
 	// create a channel, for sending the questions' answers - the cartesian coordinates
 	answers := make(chan cartesian)
-	go func () {
+	go func() {
 		for {
 			// note: <- used as an unary operater, obtain a polar coordinate
 			// from the 'questions' channel
@@ -62,7 +63,7 @@ func createSolver(questions chan polar) chan cartesian {
 
 const result = "Polar radius=%.02f θ=%.02f -> Cartesian x=%.02f y=%.02f\n"
 
-func interact (questions chan polar, answers chan cartesian) {
+func interact(questions chan polar, answers chan cartesian) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf(prompt)
 
@@ -80,7 +81,7 @@ func interact (questions chan polar, answers chan cartesian) {
 		}
 
 		questions <- polar{radius, θ}
-		coord := <- answers
+		coord := <-answers
 
 		fmt.Printf(result, radius, θ, coord.x, coord.y)
 	}

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"unicode/utf8"
-	"math"
 )
 
 type polar struct {
@@ -43,7 +43,7 @@ func main() {
 
 	// float
 	{
-		for _, x := range []float64 {-.258, 7194.84, -60897162.0218, 1.500089e-8} {
+		for _, x := range []float64{-.258, 7194.84, -60897162.0218, 1.500089e-8} {
 			fmt.Printf("|%20.5e|%20.5f|%s|\n", x, x, Humanize(x, 20, 5, '*', ','))
 		}
 	}
@@ -94,27 +94,27 @@ func main() {
 	}
 
 	{
-		fmt.Println([]float64 {math.E, math.Pi, math.Phi})
-		fmt.Printf("%v\n", []float64 {math.E, math.Pi, math.Phi})
-		fmt.Printf("%#v\n", []float64 {math.E, math.Pi, math.Phi})
-		fmt.Printf("%.5f\n", []float64 {math.E, math.Pi, math.Phi})
+		fmt.Println([]float64{math.E, math.Pi, math.Phi})
+		fmt.Printf("%v\n", []float64{math.E, math.Pi, math.Phi})
+		fmt.Printf("%#v\n", []float64{math.E, math.Pi, math.Phi})
+		fmt.Printf("%.5f\n", []float64{math.E, math.Pi, math.Phi})
 
 		fmt.Printf("%q\n", []string{"Software patents", "kill", "innovation"})
 		fmt.Printf("%v\n", []string{"Software patents", "kill", "innovation"})
 		fmt.Printf("%#v\n", []string{"Software patents", "kill", "innovation"})
 		fmt.Printf("%17s\n", []string{"Software patents", "kill", "innovation"})
 
-		fmt.Printf("%v\n", map[int]string{1:"A", 2:"B", 3:"C", 4:"D"})
-		fmt.Printf("%#v\n", map[int]string{1:"A", 2:"B", 3:"C", 4:"D"})
+		fmt.Printf("%v\n", map[int]string{1: "A", 2: "B", 3: "C", 4: "D"})
+		fmt.Printf("%#v\n", map[int]string{1: "A", 2: "B", 3: "C", 4: "D"})
 
-		fmt.Printf("%v\n", map[int]int{1:1, 2:2, 3:4, 4:8})
-		fmt.Printf("%#v\n", map[int]int{1:1, 2:2, 3:4, 4:8})
-		fmt.Printf("%04b\n", map[int]int{1:1, 2:2, 3:4, 4:8})
+		fmt.Printf("%v\n", map[int]int{1: 1, 2: 2, 3: 4, 4: 8})
+		fmt.Printf("%#v\n", map[int]int{1: 1, 2: 2, 3: 4, 4: 8})
+		fmt.Printf("%04b\n", map[int]int{1: 1, 2: 2, 3: 4, 4: 8})
 	}
 
 }
 
-func IntForBool (b bool) int {
+func IntForBool(b bool) int {
 	if b {
 		return 1
 	}
@@ -131,7 +131,6 @@ func Pad(number, width int, pad rune) string {
 	return s
 }
 
-
 func Humanize(amount float64, width, decimals int, pad, separator rune) string {
 	// return the integer and fractional-point number that sums to amount
 	dollars, cents := math.Modf(amount)
@@ -140,13 +139,13 @@ func Humanize(amount float64, width, decimals int, pad, separator rune) string {
 
 	if decimals > 0 {
 		fraction = fmt.Sprintf("%+.*f", decimals, cents) // force unify format, apply the lengh rule which is speicified by the decimal param
-		fraction = fraction[2:] // strip the leading ±0
+		fraction = fraction[2:]                          // strip the leading ±0
 	}
 
 	// apply the thousand separator
 	sep := string(separator) // convert rune/character to string
 	for i := len(whole) - 3; i > 0; i -= 3 {
-		whole = whole[:i] + sep + whole[i:]		// insert the separator
+		whole = whole[:i] + sep + whole[i:] // insert the separator
 		fmt.Println("whole: ", whole)
 	}
 

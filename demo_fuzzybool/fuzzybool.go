@@ -31,7 +31,7 @@ func float32ForValue(value interface{}) (fuzzy float32, err error) {
 			fuzzy = 1
 		}
 	default:
-		return 0, fmt.Errorf("float32ForValue(): %v is not a "+ " number of Boolean", value)
+		return 0, fmt.Errorf("float32ForValue(): %v is not a "+" number of Boolean", value)
 	}
 
 	if fuzzy < 0 {
@@ -74,7 +74,7 @@ func (fuzzy *FuzzyBool) And(first *FuzzyBool, rest ...*FuzzyBool) *FuzzyBool {
 	return &FuzzyBool{minimum}
 }
 
-func (fuzzy *FuzzyBool) Or (first *FuzzyBool, rest ...*FuzzyBool) *FuzzyBool {
+func (fuzzy *FuzzyBool) Or(first *FuzzyBool, rest ...*FuzzyBool) *FuzzyBool {
 	maximum := fuzzy.value
 	rest = append(rest, first)
 
@@ -108,12 +108,12 @@ func (fuzzy *FuzzyBool) Float() float64 {
 
 // -----------------------------------------------------------------------------
 func main() {
-	a, _ := New(0)		// can safely ignore the value of err
-	b, _ := New(.25)		// confirmed as valid value, need confirm when use
-	c, _ := New(.75)		// still is a variable
-	d    := c.Copy()
+	a, _ := New(0)   // can safely ignore the value of err
+	b, _ := New(.25) // confirmed as valid value, need confirm when use
+	c, _ := New(.75) // still is a variable
+	d := c.Copy()
 
-	if err :=d.Set(1); err != nil {
+	if err := d.Set(1); err != nil {
 		fmt.Println(err)
 	}
 
@@ -143,4 +143,3 @@ func process(a, b, c, d *FuzzyBool) {
 	fmt.Println("Bool:,,", a.Bool(), b.Bool(), c.Bool(), d.Bool())
 	fmt.Println("Float: ", a.Float(), b.Float(), c.Float(), d.Float())
 }
-
