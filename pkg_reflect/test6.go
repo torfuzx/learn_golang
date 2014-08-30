@@ -56,6 +56,27 @@ func main() {
 		fmt.Println("translated: ", (*translated.(*I)), "->", (*translated.(*I)).(B).Ptr)
 	}
 	fmt.Println()
+	{
+		fmt.Println("Translating a pointer to a struct wrapped in a interface")
+		original := &created
+		translated := translate(original)
+		fmt.Println("original: ", (*original), "->", (*original).(B).Ptr)
+		fmt.Println("translated: ", (*translated).(*I), "->", (*translated.(*I)).(B).Ptr)
+	}
+	fmt.Println()
+	{
+		fmt.Println("Translating a struct containing a pointer to a struct wrapped in an interface")
+		type D struct {
+			Payload *I
+		}
+		original := D{
+			Payload: &created,
+		}
+		translated := translate(original)
+		fmt.Println("original: ", original, "->", (*original.Payload), "->", (*original.Payload).(B).Ptr)
+		fmt.Println("translated:", translated, "->", (*translated.(D).Payload), (*(translated.(D).Payload)).(B).Ptr)
+	}
+
 }
 
 func create() I {
