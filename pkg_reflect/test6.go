@@ -71,8 +71,8 @@ func main() {
 		fmt.Println("Translating a struct:")
 		original := created.(B)
 		translated := translate(original)
-		fmt.Println("original: ", original, "->", original.Ptr)
-		fmt.Println("translated: ", translated, "->", translated.(B).Ptr)
+		fmt.Printf("original:\n%#v -> %#v\n", original, original.Ptr)
+		fmt.Printf("translated:\n%#v -> %#v\n", translated, translated.(B).Ptr)
 	}
 	fmt.Println()
 	//	{
@@ -103,17 +103,22 @@ func main() {
 	//		fmt.Println("original: ", original, "->", (*original.Payload), "->", (*original.Payload).(B).Ptr)
 	//		fmt.Println("translated:", translated, "->", (*translated.(D).Payload), (*(translated.(D).Payload)).(B).Ptr)
 	//	}
-
 }
 
 func translate(obj interface{}) interface{} {
 	// wrap the original in a reflect.value
 	original := reflect.ValueOf(obj)
 
+	// New()  - Returns a pointer to a new zeroed value for the specified value.
+	// Elem() - Returns the value interface v contains or that poiner v points to.
+	//          It panics if v's kind is not Interface or Ptr.
 	cpy := reflect.New(original.Type()).Elem()
 	translateRecursive(cpy, original)
 
-	// remove the  reflection wrapper
+	// remove the reflection wrapper
+	// Interface() - Returns v's current value as an interface{}. It's
+	//               equivalent to:
+	//               var i interface{} = (v's underlying value)
 	return cpy.Interface()
 }
 
@@ -127,20 +132,24 @@ func translateRecursive(cpy, original reflect.Value) {
 		cpyValue := reflect.New(originalValue.Type()).Elem()
 		translateRecursive(cpyValue, originalValue)
 		cpy.Set(cpyValue)
+
 	case reflect.Ptr:
 		// to get the actual type of the original we have to call Elem()
 		cpy.Set(reflect.New(original.Elem().Type()))
 		// unwrap the pointers so we don't end up in a infinite recusion
 		translateRecursive(cpy.Elem(), original.Elem())
+
 	case reflect.Struct:
 		for i := 0; i < original.NumField(); i++ {
 			translateRecursive(cpy.Field(i), original.Field(i))
 		}
+
 	case reflect.Slice:
 		cpy.Set(reflect.MakeSlice(original.Type(), original.Len(), original.Cap()))
 		for i := 0; i < original.Len(); i++ {
 			translateRecursive(cpy.Index(i), original.Index(i))
 		}
+
 	case reflect.Map:
 		cpy.Set(reflect.MakeMap(original.Type()))
 		for _, key := range original.MapKeys() {
@@ -150,10 +159,12 @@ func translateRecursive(cpy, original reflect.Value) {
 			translateRecursive(cpyValue, originalValue)
 			cpy.SetMapIndex(key, cpyValue)
 		}
+
 	// the last two cases finish the recusion
 	case reflect.String:
 		translatedString := dict[original.Interface().(string)]
 		cpy.SetString(translatedString)
+
 	default:
 		cpy.Set(original)
 	}
