@@ -18,9 +18,9 @@ var dict = map[string]string{
 type I interface{}
 
 type A struct {
-	Greetings string
-	Message   string
-	Pi        float64
+	Greeting string
+	Message  string
+	Pi       float64
 }
 
 type B struct {
@@ -34,49 +34,6 @@ type B struct {
 
 type C struct {
 	String string
-}
-
-func main() {
-	// Imagine we have no influence on the value returned by create
-	created := create()
-
-	{
-		fmt.Println("Translating aaa struct")
-		original := created.(B)
-		translated := translate(original)
-		fmt.Println("original: ", original, "->", original.Ptr)
-		fmt.Println("translated: ", translated, "->", translated.(B).Ptr)
-	}
-	fmt.Println()
-	{
-		fmt.Println("Translating a struct wrapped in an interface")
-		original := created
-		translated := translate(original)
-		fmt.Println("original: ", (*original), "->", original.Ptr)
-		fmt.Println("translated: ", (*translated.(*I)), "->", (*translated.(*I)).(B).Ptr)
-	}
-	fmt.Println()
-	{
-		fmt.Println("Translating a pointer to a struct wrapped in a interface")
-		original := &created
-		translated := translate(original)
-		fmt.Println("original: ", (*original), "->", (*original).(B).Ptr)
-		fmt.Println("translated: ", (*translated).(*I), "->", (*translated.(*I)).(B).Ptr)
-	}
-	fmt.Println()
-	{
-		fmt.Println("Translating a struct containing a pointer to a struct wrapped in an interface")
-		type D struct {
-			Payload *I
-		}
-		original := D{
-			Payload: &created,
-		}
-		translated := translate(original)
-		fmt.Println("original: ", original, "->", (*original.Payload), "->", (*original.Payload).(B).Ptr)
-		fmt.Println("translated:", translated, "->", (*translated.(D).Payload), (*(translated.(D).Payload)).(B).Ptr)
-	}
-
 }
 
 func create() I {
@@ -96,7 +53,7 @@ func create() I {
 		},
 		StructMap: map[string]C{
 			"C": C{
-				string: "deep",
+				String: "deep",
 			},
 		},
 		Slice: []string{
@@ -104,6 +61,49 @@ func create() I {
 		},
 		Answer: 42,
 	}
+}
+
+func main() {
+	// Imagine we have no influence on the value returned by create
+	created := create()
+
+	{
+		fmt.Println("Translating a struct:")
+		original := created.(B)
+		translated := translate(original)
+		fmt.Println("original: ", original, "->", original.Ptr)
+		fmt.Println("translated: ", translated, "->", translated.(B).Ptr)
+	}
+	fmt.Println()
+	//	{
+	//		fmt.Println("Translating a struct wrapped in an interface")
+	//		original := created
+	//		translated := translate(original)
+	//		fmt.Println("original: ", (*original), "->", original.Ptr)
+	//		fmt.Println("translated: ", (*translated.(*I)), "->", (*translated.(*I)).(B).Ptr)
+	//	}
+	//	fmt.Println()
+	//	{
+	//		fmt.Println("Translating a pointer to a struct wrapped in a interface")
+	//		original := &created
+	//		translated := translate(original)
+	//		fmt.Println("original: ", (*original), "->", (*original).(B).Ptr)
+	//		fmt.Println("translated: ", (*translated).(*I), "->", (*translated.(*I)).(B).Ptr)
+	//	}
+	//	fmt.Println()
+	//	{
+	//		fmt.Println("Translating a struct containing a pointer to a struct wrapped in an interface")
+	//		type D struct {
+	//			Payload *I
+	//		}
+	//		original := D{
+	//			Payload: &created,
+	//		}
+	//		translated := translate(original)
+	//		fmt.Println("original: ", original, "->", (*original.Payload), "->", (*original.Payload).(B).Ptr)
+	//		fmt.Println("translated:", translated, "->", (*translated.(D).Payload), (*(translated.(D).Payload)).(B).Ptr)
+	//	}
+
 }
 
 func translate(obj interface{}) interface{} {
@@ -117,7 +117,7 @@ func translate(obj interface{}) interface{} {
 	return cpy.Interface()
 }
 
-func translateRecusive(cpy, original reflect.Value) {
+func translateRecursive(cpy, original reflect.Value) {
 	switch original.Kind() {
 	// the first case handle nested structures and translate them recusively
 	case reflect.Interface:
@@ -125,21 +125,21 @@ func translateRecusive(cpy, original reflect.Value) {
 		originalValue := original.Elem()
 		// now gives us a pointer, but we want the value it points to
 		cpyValue := reflect.New(originalValue.Type()).Elem()
-		translateRecusive(cpyValue, originalValue)
+		translateRecursive(cpyValue, originalValue)
 		cpy.Set(cpyValue)
 	case reflect.Ptr:
 		// to get the actual type of the original we have to call Elem()
 		cpy.Set(reflect.New(original.Elem().Type()))
 		// unwrap the pointers so we don't end up in a infinite recusion
-		translateRecusive(cpy.Elem(), original.Elem())
+		translateRecursive(cpy.Elem(), original.Elem())
 	case reflect.Struct:
 		for i := 0; i < original.NumField(); i++ {
-			translateRecusive(cpy.Field(i), original.Field(i))
+			translateRecursive(cpy.Field(i), original.Field(i))
 		}
 	case reflect.Slice:
 		cpy.Set(reflect.MakeSlice(original.Type(), original.Len(), original.Cap()))
 		for i := 0; i < original.Len(); i++ {
-			translateRecusive(cpy.Index(i), original.Index(i))
+			translateRecursive(cpy.Index(i), original.Index(i))
 		}
 	case reflect.Map:
 		cpy.Set(reflect.MakeMap(original.Type()))
@@ -147,11 +147,11 @@ func translateRecusive(cpy, original reflect.Value) {
 			originalValue := original.MapIndex(key)
 			// New gives us a pointer, but again we want the value
 			cpyValue := reflect.New(originalValue.Type()).Elem()
-			translateRecusive(cpyValue, originalValue)
+			translateRecursive(cpyValue, originalValue)
 			cpy.SetMapIndex(key, cpyValue)
 		}
 	// the last two cases finish the recusion
-	case reflect.Reflect.String:
+	case reflect.String:
 		translatedString := dict[original.Interface().(string)]
 		cpy.SetString(translatedString)
 	default:
