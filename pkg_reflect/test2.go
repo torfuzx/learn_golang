@@ -1,3 +1,9 @@
+/*******************************************************************************
+
+Example originated from the go reflect package officical documentation.
+
+*******************************************************************************/
+
 package main
 
 import (
@@ -7,7 +13,7 @@ import (
 
 func main() {
 	// swap is the implmentation passed to MakeFunc. It must work in terms of
-	// reflect.Values so that itt is possible to write code without knowing
+	// reflect.Value so that it is possible to write code without knowing
 	// beforehand what the type will be.
 	swap := func(in []reflect.Value) []reflect.Value {
 		return []reflect.Value{in[1], in[0]}
@@ -30,7 +36,7 @@ func main() {
 		fn.Set(v)
 	}
 
-	// make and call a swap function for  ints
+	// make and call a swap function for ints
 	var intSwap func(int, int) (int, int)
 	makeSwap(&intSwap)
 	fmt.Println(intSwap(0, 1))

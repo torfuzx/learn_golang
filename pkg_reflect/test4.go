@@ -12,7 +12,6 @@ type Dish struct {
 	Query  func()
 }
 
-
 func attributes(m interface{}) map[string]reflect.Type {
 	typ := reflect.TypeOf(m)
 

@@ -1,13 +1,13 @@
-/*
+/*******************************************************************************
 
-- ValueOf() returns a new value initialized to the concrete value stored in the 
+- ValueOf() returns a new value initialized to the concrete value stored in the
 interface i.
 - Value.FieldByName() returns the struct field with the given name
 - Value.Int() returns underlying vlaue, as a int64
-- Value.Elem() returns the value that the interface v contains or that the 
+- Value.Elem() returns the value that the interface v contains or that the
 pointer v points to.
 
-*/
+*******************************************************************************/
 
 package main
 
