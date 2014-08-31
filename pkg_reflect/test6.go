@@ -1,8 +1,15 @@
+/*******************************************************************************
+
+Adapted from:
+http://www.snip2code.com/Snippet/47387/Golang-reflection--traversing-arbitrary-
+
+*******************************************************************************/
 package main
 
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 var dict = map[string]string{
@@ -36,6 +43,11 @@ type C struct {
 	String string
 }
 
+type D struct {
+	Payload *I
+}
+
+// Be noted that it returns an interface.
 func create() I {
 	return B{
 		Struct: A{
@@ -64,45 +76,39 @@ func create() I {
 }
 
 func main() {
-	// Imagine we have no influence on the value returned by create
+	// Imagine we have no influence on the value returned by create(), don't
+	// what type it will return.
 	created := create()
+	printLine()
 
 	{
-		fmt.Println("Translating a struct:")
+		fmt.Println("# Translating a struct:")
 		original := created.(B)
 		translated := translate(original)
-		fmt.Printf("original:\n%#v -> %#v\n", original, original.Ptr)
-		fmt.Printf("translated:\n%#v -> %#v\n", translated, translated.(B).Ptr)
+		printOutcome(original, original.Ptr, translated, translated.(B).Ptr)
+		printLine()
 	}
-	fmt.Println()
-	//	{
-	//		fmt.Println("Translating a struct wrapped in an interface")
-	//		original := created
-	//		translated := translate(original)
-	//		fmt.Println("original: ", (*original), "->", original.Ptr)
-	//		fmt.Println("translated: ", (*translated.(*I)), "->", (*translated.(*I)).(B).Ptr)
-	//	}
-	//	fmt.Println()
-	//	{
-	//		fmt.Println("Translating a pointer to a struct wrapped in a interface")
-	//		original := &created
-	//		translated := translate(original)
-	//		fmt.Println("original: ", (*original), "->", (*original).(B).Ptr)
-	//		fmt.Println("translated: ", (*translated).(*I), "->", (*translated.(*I)).(B).Ptr)
-	//	}
-	//	fmt.Println()
-	//	{
-	//		fmt.Println("Translating a struct containing a pointer to a struct wrapped in an interface")
-	//		type D struct {
-	//			Payload *I
-	//		}
-	//		original := D{
-	//			Payload: &created,
-	//		}
-	//		translated := translate(original)
-	//		fmt.Println("original: ", original, "->", (*original.Payload), "->", (*original.Payload).(B).Ptr)
-	//		fmt.Println("translated:", translated, "->", (*translated.(D).Payload), (*(translated.(D).Payload)).(B).Ptr)
-	//	}
+	{
+		fmt.Println("# Translating a struct wrapped in an interface:")
+		original := created
+		translated := translate(original)
+		printOutcome(original, original.(B).Ptr, translated, translated.(B).Ptr)
+		printLine()
+	}
+	{
+		fmt.Println("# Translating a pointer to a struct wrapped in a interface:")
+		original := &created
+		translated := translate(original)
+		printOutcome((*original), (*original).(B).Ptr, (*translated.(*I)), (*translated.(*I)).(B).Ptr)
+		printLine()
+	}
+	{
+		fmt.Println("# Translating a struct containing a pointer to a struct wrapped in an interface: ")
+		original := D{Payload: &created}
+		translated := translate(original)
+		printOutcome2(original, (*original.Payload), (*original.Payload).(B).Ptr,
+			translated, (*translated.(D).Payload), (*(translated.(D).Payload)).(B).Ptr)
+	}
 }
 
 func translate(obj interface{}) interface{} {
@@ -168,4 +174,18 @@ func translateRecursive(cpy, original reflect.Value) {
 	default:
 		cpy.Set(original)
 	}
+}
+
+func printLine() {
+	fmt.Println(strings.Repeat("-", 80))
+}
+
+func printOutcome(a, b, c, d interface{}) {
+	fmt.Printf("## original:\n-> %#v\n-> %#v\n", a, b)
+	fmt.Printf("## translated:\n-> %#v\n-> %#v\n", c, d)
+}
+
+func printOutcome2(a, b, c, d, e, f interface{}) {
+	fmt.Printf("## original:\n-> %#v\n-> %#v\n\n-> %#v\n", a, b, c)
+	fmt.Printf("## translated:\n-> %#v\n-> %#v\n\n-> %#v\n", d, e, f)
 }
