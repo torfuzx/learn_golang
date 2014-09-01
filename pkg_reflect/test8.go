@@ -94,21 +94,21 @@ import (
 )
 
 func main() {
-	// 1st law
+	// 1st law - reflection goes from interface value to reflection object
 	{
 		var x float64 = 3.4
-		fmt.Printf("type:  %v, %#v \n", reflect.TypeOf(x), reflect.TypeOf(x))
-		fmt.Printf("value: %v, %#v \n", reflect.ValueOf(x), reflect.ValueOf(x))
+		fmt.Printf("type:  %v, %#v \n", reflect.TypeOf(x), reflect.TypeOf(x))   // float64
+		fmt.Printf("value: %v, %#v \n", reflect.ValueOf(x), reflect.ValueOf(x)) // <float64 Value>
 
 		v := reflect.ValueOf(x)
-		fmt.Println("type: ", v.Type())
-		fmt.Println("kind is float64: ", v.Kind() == reflect.Float64)
-		fmt.Println("value:", v.Float())
+		fmt.Println("type: ", v.Type())                               // float64
+		fmt.Println("kind is float64: ", v.Kind() == reflect.Float64) // true
+		fmt.Println("value:", v.Float())                              // 3.4
 
 		var y uint8 = 'x'
 		v = reflect.ValueOf(y)
-		fmt.Println("type: ", v.Type())
-		fmt.Println("kind is uint8: ", v.Kind() == reflect.Uint8)
+		fmt.Println("type: ", v.Type())                           // uint8
+		fmt.Println("kind is uint8: ", v.Kind() == reflect.Uint8) // true
 		y = uint8(v.Uint())
 
 		// The Kind cannot discrimiate an int from a MyInt even though that
@@ -116,22 +116,22 @@ func main() {
 		type MyInt int
 		var z MyInt = 7
 		v = reflect.ValueOf(z)
-		fmt.Println("type is: ", v.Type())
-		fmt.Println("kind is:", v.Kind())
+		fmt.Println("type is: ", v.Type()) // main.MyInt
+		fmt.Println("kind is:", v.Kind())  // int
 		PrintLine()
 	}
 
-	// 2nd law
+	// 2nd law - reflection goes fom reflection object to interface value
 	{
 		var x float64 = 3.4
 		v := reflect.ValueOf(x)
 		y := v.Interface().(float64)
-		fmt.Println(y)
-		fmt.Printf("value is: %7.1e\n", v.Interface())
+		fmt.Println(y)                                 // 3.4
+		fmt.Printf("value is: %7.1e\n", v.Interface()) // 3.4e+00
 		PrintLine()
 	}
 
-	// 3rd law
+	// 3rd law - to modify a reflection object, the value must be settable
 	{
 		//var x float64 = 3.4
 		//v := reflect.ValueOf(x)
@@ -140,14 +140,14 @@ func main() {
 
 		var x float64 = 3.4
 		v := reflect.ValueOf(x)
-		fmt.Println("settability of v: ", v.CanSet())
+		fmt.Println("settability of v: ", v.CanSet()) // false
 
 		p := reflect.ValueOf(&x)
-		fmt.Println("type of p:", p.Type())
-		fmt.Println("settability of p:", p.CanSet())
+		fmt.Println("type of p:", p.Type())          // *float64
+		fmt.Println("settability of p:", p.CanSet()) // false
 
 		v = p.Elem()
-		fmt.Println("settability of v:", v.CanSet())
+		fmt.Println("settability of v:", v.CanSet()) // true
 		v.SetFloat(7.1)
 		fmt.Println(v.Interface())
 		fmt.Println(x)
