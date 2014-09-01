@@ -13,17 +13,17 @@ Go is statically typed. Every variable has a static type, that is exactly one
 type known and fixed at compile time.
 
 One important category of type is interface types, which represent fixed set of
-method. An interface variable can store any concrete(non-interface) value as
-long as that value implements the  interface's methods.
+methods. An interface variable can store any concrete(non-interface) value as
+long as that value implements the interface's methods.
 
-An variable of interface type always has the same static type, and even though
+A variable of interface type always has the same static type, and even though
 at run time, the value stored in the interface variable may change type, that
 value will always satisfy the interface.
 
 
 The repesentation of an interface
 ----------------------------------
-A variable of interfface type stores a pair: the concrete value assigned to the
+A variable of interface type stores a pair: the concrete value assigned to the
 variable, and that value's type descriptor. To be more precise, the value is
 the underlying concrete data item that implements the inteface and the type
 describes the full type of that item.
@@ -36,8 +36,8 @@ One important detail is that the pair inside an interface always has the form
 (value, concrete type) and cannot have the form (value, innterface type).
 Interfaces do not hold interface values.
 
-The laws
-========
+The three laws
+==============
 
 1. Reflection goes from interface value to reflection object.
 -------------------------------------------------------------
@@ -60,11 +60,11 @@ static type.
 2. Reflectioin goes from reflection object to interface value.
 --------------------------------------------------------------
 
-Like physical reflection, refleciton in Go generats its own inverse.
+Like physical reflection, refleciton in Go generates its own inverse.
 
 Given a reflect.Value we can recover an interface value using the Interface
 method; in effect the method packs the type and value information back into an
-interface an interfface representation and the returns the result.
+interface representation and returns the result.
 
 The Interface method is the inverse of the ValueOf function, except that its
 result is always of static type interface{}
@@ -77,7 +77,7 @@ have it.
 
 Settability is like addressability, but stricter. It is the property that a
 reflection object can modify the actual storage that was used to create the
-reflection object. Settabilit is determmined by whether the reflection object
+reflection object. Settability is determmined by whether the reflection object
 holds the original item.
 
 Reflection Values need the address of something in order to modify what they
