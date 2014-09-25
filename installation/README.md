@@ -26,7 +26,20 @@ Install golang 1.2.2 on Ubuntu 14.04
 
 4. Make the go's binaries dicoverable by the system 
   
+  Add this line to the `~/.bashrc`:
   ```
   export PATH=$PATH:/usr/local/go/bin
+  ```
+  and then apply the new change:
+  
+  ```bash
+  source ~/.bashrc
+  ```
+5. Make sure go's installed, by running `go version`
+  
+  You should see the following output: 
+  ```
+  $ go version
+  go version go1.2.2 linux/amd64
   ```
 
