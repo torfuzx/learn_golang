@@ -43,3 +43,13 @@ Install golang 1.2.2 on Ubuntu 14.04
   go version go1.2.2 linux/amd64
   ```
 
+6. Set up the GOPATH environment variable 
+
+  Choose a folder as you gopath, here I choose '/home/kurt/gopath' as mine, and add the following lines to the `./bashrc`
+  ```
+  export GOPATH="/home/kurt/gopath"
+  export PATH=$PATH:/home/kurt/gopath/bin
+  ```
+
+  
+  
