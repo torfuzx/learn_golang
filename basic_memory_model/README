@@ -1,0 +1,171 @@
+The go memory model specifies the conditions under which reads of a variable
+in one goroutine can be guaranteed to observe values produced by writes to the
+same variable in a different goroutine.
+
+
+Happens before
+--------------
+
+Winthin a single goroutine, read and write must behave as if they executed in
+the order specified by the program. That is compilers and processors may reorder
+the reads and writes executed within a single goroutine only when the ordering
+doesn't change the behavior within that goroutine as defined by the language
+specification. Because of this reordering, the execution order observed by one
+goroutine may differ from the order preceived by another.
+
+To specify the requirements of reads and writes, we define happens before, a
+partial order on the execution of memory operation in a go program. If event
+e1 happens before event e2, then we say that e2 happens after e1. Also, if e1
+doesn't happen before e2 and doesn't happen after e2, then we say that e1 and e2
+happens concurently.
+
+Within a single goroutine, the happens-before order the order expressed by the
+program.
+
+A read r of a variable v is allowed to observe a write w to v if both of the
+following hold:
+
+1. w happens before r
+2. There is no other write w' to v that happens after w but before r
+
+To guarantee that a read r of a variable v observes a particular w to v, ensure
+that w is the only write r is allowed to observe. That is, r is guaranteed to
+observe w if both of the following hold:
+
+1. w happens before r
+2. Any other write to the shared variable v either happens before w of after r
+
+This pair of condition is stronger that the first pair; it requires that there
+ are no other writes happpening concurrently with w or r.
+
+Within a single goroutine, there is no concurrency, so the two definitions are
+equivalent; a read r observes the value written by the most recent write w to
+v. When multiple goroutines access a shared variable v, they must use
+synchronization events to establish happens before conditions that ensure reads
+observe the desired writes.
+
+The initialization of variable v with the zero value for v's type behaves as
+a write in the memory model.
+
+Read and writes of values larger than a single machine word behaves as multiple
+machine-word-sized operations in a unspecified order.
+
+Synchronization
+---------------
+
+### Initialization
+
+Program initialization runs in a single goroutine and new goroutines created
+during initialization do not start running until initialization ends.
+
+- If a package p imports package q, the completion of q's init functions happens
+before the start of any's p's
+
+- The start of the function main.main happens after all init functions have
+  finished
+
+- The execution of any goroutines created during init functions happens after
+  all init functions have finished
+
+### Goroutine creation
+
+The go statement that starts a new goroutine happens before the goroutine's
+execution begins.
+
+### Goroutine destruction
+
+The exit of a goroutine is not guaranteed to happen before any event in the
+program.
+
+```
+var a string
+
+func hello() {
+	go func() { a = "hello" }()
+	print(a)
+}
+```
+
+The assignment to a is not followed by any synchronization event, so it is not
+guaranteed to be observed by other goroutine. In fact, an aggressive compiler
+ might delete the entire go statement.
+
+If the effects of a goroutine must be observed by another goroutine, use a
+synchronization mechanism such as a lock or channel communication to establish
+a relative ordering.
+
+### Channel communication
+
+Channel communication is the main method of synchronization between goroutines.
+Each send on a particular channel is matched to a corresponding receive from
+that channel, usually in a different goroutine.
+
+- A send on a channel happens before the corresponding receive from that channel
+completes.
+
+- The closing of a channel happens before a receive that returns a zero value
+because the channel is closed.
+
+- A receive from an unbuffered channel happens before the send on that channel
+completes.
+
+
+### Locks
+
+The sync package implements two lock data types, sync.Mutex and sync.RWMutex.
+
+- For any sync.Mutex or sync.RWMutex variable l, and n < m, the n'th call to
+l.Unlock() happens before the m'th call to l.Lock() returns.
+
+- For any call to l.RLock on a sync.RWMutex variable l, there is an n such that
+the l.RLock happens(returns) after the n'th call to l.Unlock and the matching
+l.RUnlock happens before the n + 1'th call to l.Lock.
+
+### Once
+
+The sync package provides a safe mechanism for initialization in the presence of
+multiple goroutines through the use of the `Once` type. Multiple threads can
+execute once.Do(f) for a particular f, but only onw will run f(), and the other
+calls block until f() has returned.
+
+A single call of f() from once.Do(f) happens(returns) before any call of
+`once.Do(f)` returns.
+
+
+Incorrect synchronization
+-------------------------
+
+Note that the read r may observe the value written by a write w that happens
+concurrently with r. Even if this occurs, it does not imply that reads
+happening after r will observe writes that happened before w.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+aa
