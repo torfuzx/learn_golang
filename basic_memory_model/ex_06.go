@@ -29,6 +29,10 @@ func doprint() {
 }
 
 func twoprint() {
+	defer func() {
+		logger.Println("twoprint done")
+	}()
+	logger.Println("twoprint do...")
 	wg.Add(2)
 	go doprint()
 	go doprint()

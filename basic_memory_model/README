@@ -139,33 +139,6 @@ Note that the read r may observe the value written by a write w that happens
 concurrently with r. Even if this occurs, it does not imply that reads
 happening after r will observe writes that happened before w.
 
+Double-checked locking is an attempt to avoid the overhead of synchonization.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-aa
+Use explicit synchronization.
